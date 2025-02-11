@@ -102,7 +102,7 @@ local function updateESP()
                 line.Size = Vector3.new(0.1, 0.1, (distance or 0))
                 line.Color = ESP_COLOR
                 line.Parent = workspace
-                Debris:AddItem(line, 5) -- Clean up the line after 5 seconds
+                Debris:AddItem(line, 0.1) -- Clean up the line after 5 seconds
 
                 local attachment0 = Instance.new("Attachment")
                 local attachment1 = Instance.new("Attachment")
@@ -123,7 +123,7 @@ end
 -- Disable and Re-enable ESP every second (as before)
 task.spawn(function()
     while true do
-        wait(1)  -- Every 1 second
+        wait(0.1)  -- Every 1 second
         disableESP()  -- Disable ESP
         wait(0.005)
         enableESP()  -- Re-enable ESP
