@@ -124,9 +124,10 @@ end
 task.spawn(function()
     while true do
         wait(1)  -- Every 1 second
-        if ESP_ENABLED then
-            updateESP()  -- Update ESP
-        end
+        disableESP()  -- Disable ESP
+        wait(0.005)
+        enableESP()  -- Re-enable ESP
+        updateDistanceDisplay()  -- Update the displayed distance
     end
 end)
 
