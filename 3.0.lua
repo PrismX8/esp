@@ -121,9 +121,27 @@ local function updateESP()
     end
 end
 
+-- Disable and Re-enable ESP every second (as before)
 task.spawn(function()
     while true do
-        wait(0.005)
-        updateESP()  -- Re-enable ESP
+        wait(1)  -- Every 1 second
+        if ESP_ENABLED then
+            updateESP()  -- Update ESP
+        end
     end
 end)
+
+-- ESP Toggle Button
+ESPButton.MouseButton1Click:Connect(function()
+    ESP_ENABLED = not ESP_ENABLED
+    ESPButton.Text = ESP_ENABLED and "👁️ ESP: ON" or "👁️ ESP: OFF"
+    ESPButton.BackgroundColor3 = ESP_ENABLED and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
+
+    if ESP_ENABLED then
+        enableESP()
+    else
+        disableESP()
+    end
+end)
+
+print("[ESP Script] ESP highlights players, displays their name and distance, and draws lines.")
