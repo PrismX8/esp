@@ -69,6 +69,9 @@ local function disableESPForever()
     print("[ESP] Permanently Disabled - Cannot be turned on again until script restarts")
 end
 
+_G.ESP = _G.ESP or {}
+_G.ESP.disableESPForever = disableESPForever
+
 -- Function to calculate distance between the local player and another player
 local function getDistanceToPlayer(player)
     local character = player.Character
