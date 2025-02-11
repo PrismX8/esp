@@ -130,15 +130,3 @@ task.spawn(function()
     end
 end)
 
--- Function to toggle ESP
-local function toggleESP()
-    ESP_ENABLED = not ESP_ENABLED
-    if ESP_ENABLED then
-        enableESP()
-    else
-        disableESP()
-    end
-end
-
--- Return the toggle function so it can be called externally
-return toggleESP
