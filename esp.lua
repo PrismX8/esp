@@ -12,17 +12,14 @@ local function createHighlight(player)
 
     local function applyHighlight(character)
         if not character then return end
-        
-        for _, part in ipairs(character:GetChildren()) do
-            if part:IsA("BasePart") and not part:FindFirstChild("Highlight") then
-                local highlight = Instance.new("SelectionBox")
-                highlight.Name = "Highlight"
-                highlight.Adornee = part
-                highlight.Color3 = ESP_COLOR
-                highlight.Transparency = 0.5
-                highlight.Parent = part
-            end
-        end
+
+        -- Create a full-body highlight
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESP_Highlight"
+        highlight.FillColor = ESP_COLOR
+        highlight.OutlineColor = ESP_COLOR
+        highlight.FillTransparency = 0.5
+        highlight.Parent = character
     end
 
     -- Apply highlight immediately if character exists
@@ -38,12 +35,8 @@ end
 local function disableESP()
     for _, player in ipairs(Players:GetPlayers()) do
         if player.Character then
-            for _, part in ipairs(player.Character:GetChildren()) do
-                if part:IsA("BasePart") then
-                    local highlight = part:FindFirstChild("Highlight")
-                    if highlight then highlight:Destroy() end
-                end
-            end
+            local highlight = player.Character:FindFirstChild("ESP_Highlight")
+            if highlight then highlight:Destroy() end
         end
     end
     print("[ESP] Disabled")
@@ -86,7 +79,7 @@ local function updateDistanceDisplay()
         end
     end
 
-    -- Display the closest player's name and distance on the ESPButton (can be modified for any UI)
+    -- Display the closest player's name and distance on the ESPButton
     if closestPlayer then
         ESPButton.Text = "👁️ ESP: " .. closestPlayer.Name .. " - " .. math.floor(closestDistance) .. " studs"
     else
