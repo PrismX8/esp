@@ -92,9 +92,9 @@ end
 
 task.spawn(function()
     while true do
-        wait(1)  -- Every 1 second
+        wait(4)  -- Every 1 second
         disableESP()  -- Disable ESP
-        wait(0.0005)
+        wait(0.005)
         enableESP()  -- Re-enable ESP
     end
 end)
