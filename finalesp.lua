@@ -4,6 +4,8 @@ local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
+_G.ESP_RUNNING = true -- Controls whether ESP should run
+
 
 -- Function to create highlight for a character
 local function createHighlight(player)
@@ -26,17 +28,23 @@ local function createHighlight(player)
     player.CharacterAdded:Connect(applyHighlight)
 end
 
--- Function to disable ESP highlights
-local function disableESP()
-    for _, player in ipairs(Players:GetPlayers()) do
+function disableESPForever()
+    _G.ESP_RUNNING = false -- Stop ESP loop
+
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
         if player.Character then
             local highlight = player.Character:FindFirstChild("ESP_Highlight")
             if highlight then highlight:Destroy() end
+            
             local distanceLabel = player.Character:FindFirstChild("DistanceLabel")
             if distanceLabel then distanceLabel:Destroy() end
+            
+            local line = player.Character:FindFirstChild("ESP_Line")
+            if line then line:Destroy() end
         end
     end
-    print("[ESP] Disabled")
+
+    print("[ESP] Permanently Disabled")
 end
 
 -- Function to enable ESP highlights
@@ -96,13 +104,13 @@ local function updateDistanceDisplay()
     end
 end
 
--- ESP Toggle Loop
 task.spawn(function()
-    while true do
+    while _G.ESP_RUNNING do
         wait(4)
-        if ESP_PERMANENTLY_DISABLED then return end -- Stop the loop if permanently disabled
+        if not _G.ESP_RUNNING then break end -- Stop loop when ESP is disabled
         disableESP()
         wait(0.005)
         enableESP()
     end
 end)
+
