@@ -1,4 +1,4 @@
--- ESP Toggleable Script with Highlight and Distance Display
+
 local ESP_ENABLED = false -- Initial state (ESP is OFF)
 local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
 local Players = game:GetService("Players")
@@ -37,6 +37,9 @@ local function disableESP()
         if player.Character then
             local highlight = player.Character:FindFirstChild("ESP_Highlight")
             if highlight then highlight:Destroy() end
+            -- Remove any existing distance labels
+            local distanceLabel = player.Character:FindFirstChild("DistanceLabel")
+            if distanceLabel then distanceLabel:Destroy() end
         end
     end
     print("[ESP] Disabled")
@@ -46,6 +49,21 @@ end
 local function enableESP()
     for _, player in ipairs(Players:GetPlayers()) do
         createHighlight(player)
+
+        -- Create a distance label above the player's head
+        if player.Character then
+            local distanceLabel = Instance.new("TextLabel")
+            distanceLabel.Name = "DistanceLabel"
+            distanceLabel.Size = UDim2.new(0, 100, 0, 20)
+            distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            distanceLabel.BackgroundTransparency = 1
+            distanceLabel.TextSize = 14
+            distanceLabel.Text = "0 studs"
+            distanceLabel.Parent = player.Character:FindFirstChild("Head")
+
+            -- Position the label above the player's head
+            distanceLabel.Position = UDim2.new(0, -50, 0, -20)
+        end
     end
     print("[ESP] Enabled")
 end
@@ -60,27 +78,16 @@ local function getDistanceToPlayer(player)
     return nil
 end
 
--- Update UI with distance information
+-- Function to update the distance label for each player
 local function updateDistanceDisplay()
-    local closestPlayer = nil
-    local closestDistance = math.huge
-
-    -- Find closest player and display distance
     for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
+        if player.Character and player.Character:FindFirstChild("Head") then
             local distance = getDistanceToPlayer(player)
-            if distance and distance < closestDistance then
-                closestDistance = distance
-                closestPlayer = player
+            local distanceLabel = player.Character:FindFirstChild("DistanceLabel")
+            if distanceLabel and distance then
+                distanceLabel.Text = math.floor(distance) .. " studs"
             end
         end
-    end
-
-    -- Display the closest player's name and distance on the ESPButton
-    if closestPlayer then
-        ESPButton.Text = "👁️ ESP: " .. closestPlayer.Name .. " - " .. math.floor(closestDistance) .. " studs"
-    else
-        ESPButton.Text = "👁️ ESP: No players nearby"
     end
 end
 
@@ -89,7 +96,7 @@ task.spawn(function()
     while true do
         wait(1)  -- Every 1 second
         disableESP()  -- Disable ESP
-        wait(0.005)  
+        wait(0.005)
         enableESP()  -- Re-enable ESP
         updateDistanceDisplay()  -- Update the displayed distance
     end
