@@ -1,10 +1,10 @@
--- ESP Toggleable Script (Highlight players and show distance)
+-- ESP Toggleable Script with Highlight and Distance Display
 local ESP_ENABLED = false -- Initial state (ESP is OFF)
 local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local ESPButton = script.Parent -- Adjust if needed for your button
+local RunService = game:GetService("RunService")
 
 -- Function to create highlight for a character
 local function createHighlight(player)
@@ -50,9 +50,6 @@ local function enableESP()
     print("[ESP] Enabled")
 end
 
--- Detect new players joining
-Players.PlayerAdded:Connect(createHighlight)
-
 -- Function to calculate distance between the local player and another player
 local function getDistanceToPlayer(player)
     local character = player.Character
@@ -97,12 +94,3 @@ task.spawn(function()
         updateDistanceDisplay()  -- Update the displayed distance
     end
 end)
-
--- Toggle ESP with UI Button (Only turns ON when clicked)
-ESPButton.MouseButton1Click:Connect(function()
-    enableESP()
-    ESPButton.Text = "👁️ ESP: ON"
-    ESPButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-end)
-
-print("[ESP Script] ESP highlights players and displays the closest player's distance.")
