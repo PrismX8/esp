@@ -28,25 +28,17 @@ local function createHighlight(player)
     player.CharacterAdded:Connect(applyHighlight)
 end
 
-function disableESPForever()
-    _G.ESP_RUNNING = false -- Stop ESP loop
-
-    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+local function disableESP()
+    for _, player in ipairs(Players:GetPlayers()) do
         if player.Character then
             local highlight = player.Character:FindFirstChild("ESP_Highlight")
             if highlight then highlight:Destroy() end
-            
             local distanceLabel = player.Character:FindFirstChild("DistanceLabel")
             if distanceLabel then distanceLabel:Destroy() end
-            
-            local line = player.Character:FindFirstChild("ESP_Line")
-            if line then line:Destroy() end
         end
     end
-
-    print("[ESP] Permanently Disabled")
+    print("[ESP] Disabled")
 end
-
 -- Function to enable ESP highlights
 local function enableESP()
     if ESP_PERMANENTLY_DISABLED then return end -- Prevent enabling if permanently disabled
@@ -69,12 +61,23 @@ local function enableESP()
     print("[ESP] Enabled")
 end
 
--- Function to permanently disable ESP
-local function disableESPForever()
-    ESP_PERMANENTLY_DISABLED = true
-    ESP_ENABLED = false
-    disableESP()
-    print("[ESP] Permanently Disabled - Cannot be turned on again until script restarts")
+function disableESPForever()
+    _G.ESP_RUNNING = false -- Stop ESP loop
+
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player.Character then
+            local highlight = player.Character:FindFirstChild("ESP_Highlight")
+            if highlight then highlight:Destroy() end
+            
+            local distanceLabel = player.Character:FindFirstChild("DistanceLabel")
+            if distanceLabel then distanceLabel:Destroy() end
+            
+            local line = player.Character:FindFirstChild("ESP_Line")
+            if line then line:Destroy() end
+        end
+    end
+
+    print("[ESP] Permanently Disabled")
 end
 
 _G.ESP = _G.ESP or {}
