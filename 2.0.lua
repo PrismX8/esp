@@ -90,13 +90,11 @@ local function updateDistanceDisplay()
     end
 end
 
--- Disable and Re-enable ESP every second (as before)
 task.spawn(function()
     while true do
         wait(1)  -- Every 1 second
         disableESP()  -- Disable ESP
         wait(0.005)
         enableESP()  -- Re-enable ESP
-        updateDistanceDisplay()  -- Update the displayed distance
     end
 end)
