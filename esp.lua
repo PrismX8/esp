@@ -1,4 +1,3 @@
-
 local ESP_ENABLED = false -- Initial state (ESP is OFF)
 local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
 local Players = game:GetService("Players")
