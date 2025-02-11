@@ -121,12 +121,9 @@ local function updateESP()
     end
 end
 
--- Disable and Re-enable ESP every second (as before)
 task.spawn(function()
     while true do
-        wait(1)  -- Every 1 second
-        if ESP_ENABLED then
-            updateESP()  -- Update ESP
-        end
+        wait(0.005)
+        updateESP()  -- Re-enable ESP
     end
 end)
