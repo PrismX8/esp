@@ -1,3 +1,4 @@
+--new
 local ESP_ENABLED = false -- Initial state (ESP is OFF)
 local ESP_PERMANENTLY_DISABLED = false -- Prevents ESP from being toggled back on
 local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
@@ -118,6 +119,12 @@ end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(onPlayerRemoving)
+
+-- Ensure ESP refreshes on the local player's respawn
+LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+    task.wait(1) -- Short delay to allow character to fully load
+    refreshESP()
+end)
 
 -- Control functions
 function disableESPForever()
