@@ -46,6 +46,27 @@ local function removeESP(character)
     end
 end
 
+-- Function to fully reset and restart ESP
+local function refreshESP()
+    if ESP_PERMANENTLY_DISABLED then return end
+
+    -- Remove existing ESP
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character then
+            removeESP(player.Character)
+        end
+    end
+
+    -- Recreate ESP after a short delay
+    task.wait(0.5) -- Small delay to ensure cleanup
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            createESP(player.Character)
+        end
+    end
+    print("[ESP] Refreshed")
+end
+
 -- Update distance labels continuously
 RunService.Heartbeat:Connect(function()
     if ESP_PERMANENTLY_DISABLED or not LocalPlayer.Character or not LocalPlayer.Character.PrimaryPart then return end
@@ -108,6 +129,14 @@ function disableESPForever()
     end
     print("[ESP] Permanently Disabled")
 end
+
+-- Auto-refresh ESP every 30 seconds
+task.spawn(function()
+    while true do
+        task.wait(30) -- Wait 30 seconds before refreshing
+        refreshESP()
+    end
+end)
 
 _G.ESP = _G.ESP or {}
 _G.ESP.disableESPForever = disableESPForever
