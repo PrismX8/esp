@@ -1,40 +1,37 @@
---new
 local ESP_ENABLED = false -- Initial state (ESP is OFF)
 local ESP_PERMANENTLY_DISABLED = false -- Prevents ESP from being toggled back on
-local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for highlight
+local ESP_COLOR = Color3.fromRGB(0, 255, 0) -- Green color for text
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
--- Store player connections and ESP objects to manage them properly
-local playerConnections = {}
+-- Store ESP GUI objects
 local espObjects = {}
 
--- Function to create ESP elements for a character
+-- Function to create ESP elements using BillboardGui
 local function createESP(character)
     if not character or not character:FindFirstChild("Head") then return end
 
-    -- Create Highlight
-    local highlight = Instance.new("Highlight")
-    highlight.Name = "ESP_Highlight"
-    highlight.FillColor = ESP_COLOR
-    highlight.OutlineColor = ESP_COLOR
-    highlight.FillTransparency = 0.5
-    highlight.Parent = character
+    -- Create BillboardGui
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESP_GUI"
+    billboard.Size = UDim2.new(0, 100, 0, 50) -- Adjust size as needed
+    billboard.StudsOffset = Vector3.new(0, 2, 0) -- Position above head
+    billboard.AlwaysOnTop = true
+    billboard.Parent = character.Head
 
-    -- Create Distance Label
-    local distanceLabel = Instance.new("TextLabel")
-    distanceLabel.Name = "DistanceLabel"
-    distanceLabel.Size = UDim2.new(0, 100, 0, 20)
-    distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    distanceLabel.BackgroundTransparency = 1
-    distanceLabel.TextSize = 14
-    distanceLabel.Text = "0 studs"
-    distanceLabel.Parent = character.Head
-    distanceLabel.Position = UDim2.new(0, -50, 0, -20)
+    -- Create TextLabel inside BillboardGui
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = ESP_COLOR
+    label.TextSize = 14
+    label.Font = Enum.Font.SourceSansBold
+    label.Text = "[ESP]"
+    label.Parent = billboard
 
     -- Store ESP objects for cleanup
-    espObjects[character] = {highlight, distanceLabel}
+    espObjects[character] = {billboard, label}
 end
 
 -- Function to remove ESP elements
@@ -47,7 +44,7 @@ local function removeESP(character)
     end
 end
 
--- Function to fully reset and restart ESP
+-- Function to refresh ESP
 local function refreshESP()
     if ESP_PERMANENTLY_DISABLED then return end
 
@@ -58,7 +55,7 @@ local function refreshESP()
         end
     end
 
-    -- Recreate ESP after a short delay
+    -- Recreate ESP
     task.wait(0.5) -- Small delay to ensure cleanup
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
@@ -68,14 +65,14 @@ local function refreshESP()
     print("[ESP] Refreshed")
 end
 
--- Update distance labels continuously
+-- Continuously update ESP text with distance
 RunService.Heartbeat:Connect(function()
     if ESP_PERMANENTLY_DISABLED or not LocalPlayer.Character or not LocalPlayer.Character.PrimaryPart then return end
 
     for character, data in pairs(espObjects) do
         if character.Parent and character:FindFirstChild("Head") then
             local distance = (LocalPlayer.Character.PrimaryPart.Position - character.PrimaryPart.Position).magnitude
-            data[2].Text = math.floor(distance) .. " studs"
+            data[2].Text = "[" .. math.floor(distance) .. " studs]"
         else
             removeESP(character)
         end
@@ -92,7 +89,7 @@ local function onPlayerAdded(player)
     end
 
     -- Connect to CharacterAdded event
-    playerConnections[player] = player.CharacterAdded:Connect(onCharacterAdded)
+    player.CharacterAdded:Connect(onCharacterAdded)
 
     -- Apply ESP to the current character if it exists
     if player.Character then
@@ -101,10 +98,6 @@ local function onPlayerAdded(player)
 end
 
 local function onPlayerRemoving(player)
-    if playerConnections[player] then
-        playerConnections[player]:Disconnect()
-        playerConnections[player] = nil
-    end
     if player.Character then
         removeESP(player.Character)
     end
@@ -121,9 +114,17 @@ Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(onPlayerRemoving)
 
 -- Ensure ESP refreshes on the local player's respawn
-LocalPlayer.CharacterAdded:Connect(function(newCharacter)
-    task.wait(1) -- Short delay to allow character to fully load
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1) -- Small delay to allow character to fully load
     refreshESP()
+end)
+
+-- Auto-refresh ESP every 30 seconds
+task.spawn(function()
+    while true do
+        task.wait(30) -- Wait 30 seconds before refreshing
+        refreshESP()
+    end
 end)
 
 -- Control functions
@@ -136,14 +137,6 @@ function disableESPForever()
     end
     print("[ESP] Permanently Disabled")
 end
-
--- Auto-refresh ESP every 30 seconds
-task.spawn(function()
-    while true do
-        task.wait(30) -- Wait 30 seconds before refreshing
-        refreshESP()
-    end
-end)
 
 _G.ESP = _G.ESP or {}
 _G.ESP.disableESPForever = disableESPForever
